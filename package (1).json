@@ -1,0 +1,5 @@
+PORT=10000
+NODE_ENV=production
+ADMIN_LOGIN=admin
+ADMIN_PASSWORD=change_me_strong_password
+JWT_SECRET=change_me_super_secret_jwt_key

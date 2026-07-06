@@ -1,0 +1,14 @@
+import { Router } from 'express';
+import { validateAdmin, signToken } from '../services/auth.service.js';
+
+const router = Router();
+
+router.post('/login', async (req, res) => {
+  const { login, password } = req.body || {};
+  const valid = await validateAdmin(login, password);
+  if (!valid) return res.status(401).json({ message: 'Неверный логин или пароль' });
+
+  return res.json({ token: signToken() });
+});
+
+export default router;
