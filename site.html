@@ -1,19 +1,17 @@
-import { Router } from 'express';
-import { getContent, saveContent } from '../services/content.service.js';
-import { requireAuth } from '../middleware/auth.middleware.js';
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const prisma = require('../lib/prisma');
+const router = express.Router();
 
-const router = Router();
-
-router.get('/', (_req, res) => {
-  res.json(getContent());
+router.post('/login', async (req, res) => {
+  const { login, password } = req.body || {};
+  const user = await prisma.user.findUnique({ where: { login } });
+  if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+  const ok = bcrypt.compareSync(password || '', user.passwordHash);
+  if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
+  const token = jwt.sign({ id: user.id, login: user.login, role: user.role }, process.env.JWT_SECRET, { expiresIn: '12h' });
+  res.json({ token, user: { login: user.login, role: user.role } });
 });
 
-router.put('/', requireAuth, (req, res) => {
-  const payload = req.body;
-  if (!payload || typeof payload !== 'object') {
-    return res.status(400).json({ message: 'Некорректные данные' });
-  }
-  return res.json(saveContent(payload));
-});
-
-export default router;
+module.exports = router;

@@ -1,14 +1,22 @@
-import { Router } from 'express';
-import { validateAdmin, signToken } from '../services/auth.service.js';
+const express = require('express');
+const prisma = require('../lib/prisma');
+const auth = require('../middleware/auth');
+const defaultContent = require('../lib/defaultContent');
+const router = express.Router();
 
-const router = Router();
-
-router.post('/login', async (req, res) => {
-  const { login, password } = req.body || {};
-  const valid = await validateAdmin(login, password);
-  if (!valid) return res.status(401).json({ message: 'Неверный логин или пароль' });
-
-  return res.json({ token: signToken() });
+router.get('/content', async (_, res) => {
+  let row = await prisma.siteContent.findUnique({ where: { id: 'main' } });
+  if (!row) row = await prisma.siteContent.create({ data: { id: 'main', payload: defaultContent } });
+  res.json(row.payload);
 });
 
-export default router;
+router.put('/content', auth, async (req, res) => {
+  const row = await prisma.siteContent.upsert({
+    where: { id: 'main' },
+    update: { payload: req.body || defaultContent },
+    create: { id: 'main', payload: req.body || defaultContent }
+  });
+  res.json({ success: true, content: row.payload });
+});
+
+module.exports = router;

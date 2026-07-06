@@ -1,5 +1,106 @@
-PORT=10000
-NODE_ENV=production
-ADMIN_LOGIN=admin
-ADMIN_PASSWORD=change_me_strong_password
-JWT_SECRET=change_me_super_secret_jwt_key
+# IS.BEAUTY.KH v4 — Production Ready for Render
+
+Эта версия подготовлена под GitHub + Render с более production-friendly архитектурой:
+
+- Node.js + Express backend
+- PostgreSQL через Prisma
+- Cloudinary для хранения изображений
+- JWT-авторизация
+- закрытая админка
+- публичный frontend
+
+## Тестовые данные для входа
+
+Базовый тестовый логин и пароль:
+
+- login: `admin`
+- password: `test12345`
+
+После деплоя пароль лучше сразу поменять через переменную окружения `ADMIN_PASSWORD` и повторный деплой.
+
+## Структура
+
+```bash
+isbeauty-fullstack-v4/
+├── client/
+│   ├── site.html
+│   └── admin.html
+├── server/
+│   ├── prisma/schema.prisma
+│   ├── package.json
+│   └── src/
+│       ├── server.js
+│       ├── lib/
+│       ├── middleware/
+│       ├── routes/
+│       └── seed/
+├── .env.example
+├── .gitignore
+├── package.json
+├── render.yaml
+└── README.md
+```
+
+## GitHub
+
+1. Создай новый репозиторий.
+2. Загрузи все файлы проекта.
+3. Выполни push.
+
+```bash
+git init
+git add .
+git commit -m "IS.BEAUTY.KH v4 render ready"
+git branch -M main
+git remote add origin https://github.com/USERNAME/REPO.git
+git push -u origin main
+```
+
+## Render деплой
+
+### Через Blueprint
+
+1. В Render нажми `New +` → `Blueprint`.
+2. Подключи GitHub-репозиторий.
+3. Render прочитает `render.yaml`.
+4. Будут созданы:
+   - web service
+   - PostgreSQL database
+
+## Переменные окружения
+
+Нужно заполнить:
+
+- `JWT_SECRET`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+
+Остальные уже заданы базово для теста. В `render.yaml` тестовый пароль установлен как `test12345`.
+
+## Build pipeline
+
+Во время сборки Render выполняет:
+
+```bash
+npm install
+npm run prisma:generate
+npm run prisma:migrate
+npm run seed
+```
+
+А затем запускает:
+
+```bash
+npm start
+```
+
+## После деплоя
+
+- сайт: `/`
+- админка: `/admin`
+- health: `/api/health`
+
+## Важно
+
+Текущая seed-логика при первом разворачивании создаёт admin-пользователя и базовый контент. Если позже сменишь `ADMIN_PASSWORD`, user будет пересоздан/обновлён при следующем `npm run seed` или новом деплое с seed. Для production потом можно добавить отдельную команду смены пароля из панели.

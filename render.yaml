@@ -1,2 +1,14 @@
-@echo off
-call "%~dp0start-all.bat"
+{
+  "name": "isbeauty-kh-v4",
+  "version": "1.0.0",
+  "private": true,
+  "main": "server/src/server.js",
+  "scripts": {
+    "postinstall": "npm --prefix server install",
+    "start": "node server/src/server.js",
+    "dev": "node server/src/server.js",
+    "prisma:generate": "npx prisma generate --schema server/prisma/schema.prisma",
+    "prisma:migrate": "npx prisma migrate deploy --schema server/prisma/schema.prisma",
+    "seed": "node server/src/seed/seed.js"
+  }
+}
